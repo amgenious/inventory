@@ -1,0 +1,20 @@
+[
+    {
+        "id":1,
+        "Product_Name": "Wireless Mouse",
+        "Product_Id": "P001",
+        "Category": "Electronics",
+        "Part_Number": 11265,
+        "Current_Stock": 20,
+        "Price": 200
+    },
+    {
+        "id":2,
+        "Product_Name": "Running Shoes",
+        "Product_Id": "P003",
+        "Category": "Footwear",
+        "Part_Number": 11005,
+        "Current_Stock": 75,
+        "Price": 40
+    }
+]
