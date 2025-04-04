@@ -13,13 +13,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Plus } from "lucide-react"
 import { useState } from "react"
-import { Textarea } from "../ui/textarea"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
-export function AddCategory() {
-    const [name, setCatergoryName] = useState("")
-    const [description, setDescription] = useState("")
+export function Addlocation() {
+    const [name, setLocationName] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
 
@@ -27,26 +25,26 @@ export function AddCategory() {
       setIsSubmitting(true)
       
       try {
-        const response = await fetch("/api/category", {
+        const response = await fetch("/api/locations", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({name,description}),
+          body: JSON.stringify({name}),
         })
   
         if (!response.ok) {
           const error = await response.json()
-          throw new Error(error.message || "Failed to create category")
+          throw new Error(error.message || "Failed to create post")
         }
   
         toast(
-           "Success! Category has been created.",
+           "Success! Location has been created",
         )
         router.refresh()
       } catch (error) {
         toast(
-           `Failed to create category, Error: ${error}`
+           `Failed to create location, Error ${error}`,
         )
       } finally {
         setIsSubmitting(false)
@@ -55,31 +53,25 @@ export function AddCategory() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default"><Plus /> Add Category</Button>
+        <Button variant="default"><Plus /> Add Location</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
+          <DialogTitle>Add Location</DialogTitle>
           <DialogDescription>
-            Add New Category here. Click save when you're done.
+            Add New Locations here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="name">
-              Category Name
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Location Name
             </Label>
-            <Input id="name" placeholder="Category Name" onChange={(e) => setCatergoryName(e.target.value)} className="col-span-3" />
-          </div>
-          <div className="flex items-center gap-4">
-            <Label htmlFor="description">
-                Description
-            </Label>
-            <Textarea id="description" placeholder="Description" onChange={(e) => setDescription(e.target.value)} className="col-span-3" />
+            <Input id="name" placeholder="Location Name" onChange={(e) => setLocationName(e.target.value)} className="col-span-3" required/>
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" disabled={isSubmitting} onClick={onSubmit}>
+        <Button type="submit" className="w-full" disabled={isSubmitting} onClick={onSubmit}>
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -88,7 +80,7 @@ export function AddCategory() {
           ) : (
             "Submit Post"
           )}
-          </Button>
+        </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

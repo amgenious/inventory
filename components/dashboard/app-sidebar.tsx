@@ -42,12 +42,12 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Category",
-      url: "/dashboard/category",
+      title: "Static Data",
+      url: "/dashboard/staticdata",
       icon: IconListDetails,
     },
     {
-      title: "Inventory",
+      title: "Transactions",
       url: "/dashboard/inventory",
       icon: IconChartBar,
     },

@@ -16,37 +16,41 @@ import { useState } from "react"
 import { Textarea } from "../ui/textarea"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
-export function AddCategory() {
-    const [name, setCatergoryName] = useState("")
-    const [description, setDescription] = useState("")
+const Adduser = () => {
+  const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [pass, setPassword] = useState("")
+    const [role, setRole] = useState("")
+
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
 
     async function onSubmit() {
       setIsSubmitting(true)
-      
+
       try {
-        const response = await fetch("/api/category", {
+        const response = await fetch("/api/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({name,description}),
+          body: JSON.stringify({name,email,pass,role}),
         })
   
         if (!response.ok) {
           const error = await response.json()
-          throw new Error(error.message || "Failed to create category")
+          throw new Error(error.message || "Failed to create new user")
         }
   
         toast(
-           "Success! Category has been created.",
+           "Success! New user has been created.",
         )
         router.refresh()
       } catch (error) {
         toast(
-           `Failed to create category, Error: ${error}`
+           `Failed to create new user, Error: ${error}`
         )
       } finally {
         setIsSubmitting(false)
@@ -55,13 +59,13 @@ export function AddCategory() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default"><Plus /> Add Category</Button>
+        <Button variant="default"><Plus /> Add User</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
+          <DialogTitle>Add User</DialogTitle>
           <DialogDescription>
-            Add New Category here. Click save when you're done.
+            Add New User here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -69,15 +73,33 @@ export function AddCategory() {
             <Label htmlFor="name">
               Category Name
             </Label>
-            <Input id="name" placeholder="Category Name" onChange={(e) => setCatergoryName(e.target.value)} className="col-span-3" />
+            <Input id="name" placeholder="Name" onChange={(e) => setName(e.target.value)} className="col-span-3" />
           </div>
           <div className="flex items-center gap-4">
-            <Label htmlFor="description">
-                Description
+            <Label htmlFor="email">
+              Email
             </Label>
-            <Textarea id="description" placeholder="Description" onChange={(e) => setDescription(e.target.value)} className="col-span-3" />
+            <Input id="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} className="col-span-3" />
           </div>
-        </div>
+          <div className="flex items-center gap-4">
+            <Label htmlFor="email">
+              Password
+            </Label>
+            <Input id="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} className="col-span-3" />
+          </div>
+          <div className="flex flex-col gap-3">
+                <Label htmlFor="status">Role</Label>
+                <Select onValueChange={setRole} value={role}>
+                  <SelectTrigger id="status" className="w-full">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
         <DialogFooter>
           <Button type="submit" disabled={isSubmitting} onClick={onSubmit}>
           {isSubmitting ? (
@@ -94,3 +116,5 @@ export function AddCategory() {
     </Dialog>
   )
 }
+
+export default Adduser
