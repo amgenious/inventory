@@ -1,10 +1,10 @@
 
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse} from "next/server";
 
 
-export async function POST(req:NextRequest, res:NextResponse){
+export async function POST(req:Request){
     try {
         const body = await req.json()
         const { name, email } = body
@@ -21,7 +21,7 @@ export async function POST(req:NextRequest, res:NextResponse){
         return NextResponse.json({ message: "Error creating user", error },{status:500});
       }
 }
-export async function GET(req: NextRequest, res: NextResponse){
+export async function GET(req:Request){
     try {
         await connectToDatabase();
 
