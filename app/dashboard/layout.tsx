@@ -4,6 +4,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { Toaster } from "@/components/ui/sonner"
 
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                 {children}
               </div>
+              <Toaster />
             </div>
           </div>
         </SidebarInset>
