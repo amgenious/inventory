@@ -56,7 +56,7 @@ const handleDelete = async(id:any)=> {
     })
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.message || "Failed to create category")
+      throw new Error(error.message || "Failed to create user")
     }
     toast(
           "Success! User deleted.",

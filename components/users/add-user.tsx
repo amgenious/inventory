@@ -73,19 +73,19 @@ const Adduser = () => {
             <Label htmlFor="name">
               Category Name
             </Label>
-            <Input id="name" placeholder="Name" onChange={(e) => setName(e.target.value)} className="col-span-3" />
+            <Input id="name" placeholder="Name" onChange={(e) => setName(e.target.value)} className="col-span-3" required/>
           </div>
           <div className="flex items-center gap-4">
             <Label htmlFor="email">
               Email
             </Label>
-            <Input id="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} className="col-span-3" />
+            <Input id="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} className="col-span-3" required/>
           </div>
           <div className="flex items-center gap-4">
             <Label htmlFor="email">
               Password
             </Label>
-            <Input id="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} className="col-span-3" />
+            <Input id="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} className="col-span-3" required/>
           </div>
           <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Role</Label>
@@ -108,7 +108,7 @@ const Adduser = () => {
               Submitting...
             </>
           ) : (
-            "Submit Post"
+            "Save"
           )}
           </Button>
         </DialogFooter>
