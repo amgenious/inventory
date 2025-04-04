@@ -2,11 +2,11 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request,  { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectToDatabase()
     
-    const { id } = params
+    const id = (await params).id;
 
     if (!id) {
       return NextResponse.json({ message: "User ID is required" }, { status: 400 })
