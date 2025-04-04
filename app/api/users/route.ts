@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, res: NextResponse){
         await connectToDatabase();
 
         const users = await User.find();
-        return NextResponse.json(users,{status:201});
+        return NextResponse.json({users},{status:201});
 
       } catch (error) {
         return NextResponse.json({ message: "Error fetching users", error },{status:500});
