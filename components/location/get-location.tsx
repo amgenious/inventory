@@ -227,7 +227,7 @@ function TableCellViewer({ item }: { item: any }) {
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit">
+        <Button variant="link" className="text-foreground w-fit cursor-pointer">
           {item.name}
         </Button>
       </DrawerTrigger>

@@ -18,13 +18,13 @@ const StaticData = () => {
   return (
     <Tabs defaultValue="location" className="w-full flex flex-row gap-5">
       <TabsList className="flex flex-col gap-4 h-full w-[150px]">
-        <TabsTrigger value="location" className='w-full flex justify-start'>Location</TabsTrigger>
-        <TabsTrigger value="category" className='w-full flex justify-start'>Category</TabsTrigger>
-        <TabsTrigger value="measurement"  className='w-full flex justify-start'>Measurement</TabsTrigger>
-        <TabsTrigger value="user"  className='w-full flex justify-start'>Users</TabsTrigger>
-        <TabsTrigger value="stock"  className='w-full flex justify-start'>Stock</TabsTrigger>
-        <TabsTrigger value="supplier"  className='w-full flex justify-start'>Supplier</TabsTrigger>
-        <TabsTrigger value="customer"  className='w-full flex justify-start'>Customer</TabsTrigger>
+        <TabsTrigger value="location" className='w-full flex justify-start cursor-pointer'>Location</TabsTrigger>
+        <TabsTrigger value="category" className='w-full flex justify-start cursor-pointer'>Category</TabsTrigger>
+        <TabsTrigger value="measurement"  className='w-full flex justify-start cursor-pointer'>Measurement</TabsTrigger>
+        <TabsTrigger value="user"  className='w-full flex justify-start cursor-pointer'>Users</TabsTrigger>
+        <TabsTrigger value="stock"  className='w-full flex justify-start cursor-pointer'>Stock</TabsTrigger>
+        <TabsTrigger value="supplier"  className='w-full flex justify-start cursor-pointer'>Supplier</TabsTrigger>
+        <TabsTrigger value="customer"  className='w-full flex justify-start cursor-pointer'>Customer</TabsTrigger>
       </TabsList>
       <TabsContent value="location">
         <LocationPage />

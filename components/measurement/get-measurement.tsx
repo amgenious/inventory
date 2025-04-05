@@ -254,20 +254,20 @@ function TableCellViewer({ item }: {item:any }) {
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit">
+        <Button variant="link" className="text-foreground w-fit cursor-pointer">
           {item.name}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>Edit Location</DrawerTitle>
+          <DrawerTitle>Edit Measurement</DrawerTitle>
           <DrawerDescription>
           </DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Location</Label>
+              <Label htmlFor="header">Measurement</Label>
               <Input id="header" defaultValue={item.name} />
             </div>
           </form>

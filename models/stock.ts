@@ -15,9 +15,9 @@ export interface IStock extends Document {
 const StockSchema: Schema = new Schema(
   {
     name: { type: String, required: true},
-    category: { type: mongoose.Schema.Types.ObjectId,ref:'Category', required: true, index:true},
-    location: { type: mongoose.Schema.Types.ObjectId, ref:'Location', required:true,index:true},
-    measurement: { type: mongoose.Schema.Types.ObjectId,ref:'Measurement', required: true, index:true},
+    category: { type: String, required: true, },
+    location: { type: String, required:true,},
+    measurement: { type: String, required: true,},
     partnumber: { type: String, required: true},
     min_stock: { type: Number, required: true},
     max_stock: { type: Number, required: true},
