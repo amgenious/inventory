@@ -48,17 +48,17 @@ const data = {
     },
     {
       title: "Transactions",
-      url: "/dashboard/inventory",
+      url: "/dashboard/transactions",
       icon: IconChartBar,
     },
     {
-      title: "Issues",
-      url: "/dashboard/issues",
+      title: "Error Corrections",
+      url: "/dashboard/corrects",
       icon: IconFolder,
     },
     {
-      title: "Receipt",
-      url: "/dashboard/receipt",
+      title: "Open Balances",
+      url: "/dashboard/balances",
       icon: IconUsers,
     },
   ],

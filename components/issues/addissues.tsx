@@ -12,19 +12,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useState,useEffect } from "react"
+import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 
 const Addissues = () => {
-    const [clientName, setClientName] = useState("")
-    const [clientContact, setContact] = useState("")
-    const [orderdate, setOrderDate] = useState("")
-    const [amountType, setAmountType] = useState("")
-    const [paymentType, setPaymentType] = useState("")
-    const [itemName, setItemname] = useState("")
-    const [quantities, setQuantities] = useState("")
-    const [price, setPrice] = useState("")
-    const [totalprice, setTotalPrice] = useState("")
+    const [referencenumber, setReferenceNumber] = useState("")
+    const [valuedate, setValueDate] = useState("")
+    const [transtype, setTranstype] = useState("")
+    const [transcode, setTransCode] = useState("")
+    const [customer, setCustomer] = useState("")
+    const [remarks, setRemarks] = useState("")
+    const [itemname, setItemname] = useState("")
+    const [partnumber, setPartNumber] = useState("")
+    const [location, setLocation] = useState("")
+    const [quantity, setQuantity] = useState(0)
   return (
     <Dialog>
     <DialogTrigger asChild>
@@ -39,34 +42,34 @@ const Addissues = () => {
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
-            Client Name
+          <Label htmlFor="date" className="text-right">
+            Value Date
           </Label>
-          <Input id="name" placeholder="Client Name" onChange={(e) => setClientName(e.target.value)} className="col-span-3" />
+          <Input id="date" placeholder="date" onChange={(e) => setValueDate(e.target.value)} value={Date.now()} className="col-span-3" disabled />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="clientcontact" className="text-right">
-              Client Contact
+          <Label htmlFor="transtype" className="text-right">
+              Trans Type
           </Label>
-          <Input id="clientcontact" placeholder="Client Contact" onChange={(e) => setContact(e.target.value)} className="col-span-3" />
+          <Input id="transtype" placeholder="Trans Type" onChange={(e) => setTranstype(e.target.value)} className="col-span-3" />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="amountType" className="text-right">
-              Amount Type
+          <Label htmlFor="transcode" className="text-right">
+              Trans Code
           </Label>
-          <Input id="amountType" placeholder="Amount Type" onChange={(e) => setAmountType(e.target.value)} className="col-span-3" />
+          <Input id="transcode" placeholder="Trans Code" onChange={(e) => setTransCode(e.target.value)} className="col-span-3" />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="paymentType" className="text-right">
-              Payment Type
+          <Label htmlFor="customer" className="text-right">
+              Customer
           </Label>
-          <Input id="paymentType" placeholder="Payment Type" onChange={(e) => setPaymentType(e.target.value)} className="col-span-3" />
+          <Input id="customer" placeholder="Customer" onChange={(e) => setCustomer(e.target.value)} className="col-span-3" />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="orderdate" className="text-right">
-              Order Date
+        <Label htmlFor="remarks" className="text-right">
+              Remarks
           </Label>
-          <Input id="orderdate" type="date" placeholder="Orderdate" onChange={(e) => setOrderDate(e.target.value)} className="col-span-3" />
+          <Input id="remarks" type="text" placeholder="Remarks" onChange={(e) => setRemarks(e.target.value)} className="col-span-3" />
         </div>
         <div className="grid grid-cols-3 items-center gap-4">
         <div className="flex gap-4 flex-1/3">
@@ -76,24 +79,24 @@ const Addissues = () => {
           <Input id="item"  placeholder="Item Name"  onChange={(e) => setItemname(e.target.value)} className="col-span-3" />
         </div>
             <div className="flex gap-4 flex-1/3">
+          <Label htmlFor="partnumber" className="text-right">
+              Partnumber
+          </Label>
+          <Input id="partnumber" placeholder="Price" type="text" onChange={(e) => setPartNumber(e.target.value)} className="col-span-3" />
+            </div>
+            <div className="flex gap-4 flex-1/3">
+          <Label htmlFor="location" className="text-right">
+              Location
+          </Label>
+          <Input id="location" placeholder="Location" type="text" onChange={(e) => setLocation(e.target.value)} className="col-span-3" />
+            </div>
+        </div>
+            <div className="grid grid-cols-4 items-center gap-4 ">
           <Label htmlFor="quantities" className="text-right">
               Quantities
           </Label>
-          <Input id="quantities" placeholder="Quantities" onChange={(e) => setQuantities(e.target.value)} className="col-span-3" />
+          <Input id="quantities" placeholder="Quantities" type="number" onChange={(e) => setQuantity(+e.target.value)} className="col-span-3" />
             </div>
-            <div className="flex gap-4 flex-1/3">
-          <Label htmlFor="price" className="text-right">
-              Price
-          </Label>
-          <Input id="price" placeholder="Price" type="number" onChange={(e) => setPrice(e.target.value)} className="col-span-3" />
-            </div>
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="Totalprice" className="text-right">
-             Total Price
-          </Label>
-          <Input id="Totalprice" placeholder="Total Price" type="number" onChange={(e) => setTotalPrice(e.target.value)} className="col-span-3" />           
-        </div>
       </div>
       <DialogFooter>
         <Button type="submit">Save</Button>
