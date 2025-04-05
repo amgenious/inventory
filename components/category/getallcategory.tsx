@@ -37,6 +37,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Drawer } from "../ui/drawer"
 import { Label } from "../ui/label"
 import { Textarea } from "../ui/textarea"
+import { toast } from "sonner"
 
 export type Category = {
   _id: string
@@ -44,6 +45,27 @@ export type Category = {
   description: string
 }
 
+const handleDelete = async(id:any)=> {
+  try{
+    const response = await fetch(`/api/category/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || "Failed to deleting category")
+    }
+    toast(
+          "Success! Category deleted.",
+        )
+  }catch(error){
+    toast(
+      `Failed to delete category, Error: ${error}`
+   )
+  }
+}
 export const columns: ColumnDef<Category>[] = [
   {
     id: "select",
@@ -97,20 +119,9 @@ export const columns: ColumnDef<Category>[] = [
     header:"Actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="text-red-500"><Trash className="text-red-500" /> Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+        <DeleteButton item={row.original}/>
+        )
     },
   },
 ]
@@ -297,4 +308,21 @@ function TableCellViewer({ item }: {item:any }) {
       </DrawerContent>
     </Drawer>
   )
+}
+
+function DeleteButton ({item}: {item:any}) {
+  return(
+    <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem className="text-red-500" onClick={()=>handleDelete(item._id)}><Trash className="text-red-500" /> Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+      </DropdownMenu>
+  )
+
 }

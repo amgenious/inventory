@@ -38,10 +38,32 @@ import {
   Drawer,
 } from "../ui/drawer"
 import { Label } from "../ui/label"
+import { toast } from "sonner"
 
 export type Location = {
   _id: string
   name: string
+}
+const handleDelete = async(id:any)=> {
+  try{
+    const response = await fetch(`/api/locations/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || "Failed to deleting category")
+    }
+    toast(
+          "Success! Category deleted.",
+        )
+  }catch(error){
+    toast(
+      `Failed to delete category, Error: ${error}`
+   )
+  }
 }
 export const columns: ColumnDef<Location>[] = [
   {
@@ -252,6 +274,21 @@ function TableCellViewer({ item }: { item: any }) {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
+  )
+}
+function DeleteButton ({item}: {item:any}) {
+  return(
+    <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem className="text-red-500" onClick={()=>handleDelete(item._id)}><Trash className="text-red-500" /> Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+      </DropdownMenu>
   )
 }
 export default Getlocation

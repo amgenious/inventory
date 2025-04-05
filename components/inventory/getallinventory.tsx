@@ -35,34 +35,47 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "../ui/badge"
+import { toast } from "sonner"
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "../ui/drawer"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Label } from "../ui/label"
 
-const data: Inventory[] = [
-    {
-        id:'1',
-        name:'Wireless Mouse',
-        partnumber:11265,
-        productlabel:"P001",
-        quantity:20,
-        category:"electronics",
-        maxinstock:25,
-        mininstock:5,
-        price:200
-    },
-]
 
-export type Inventory = {
-  id: string
+export type Stock = {
+  _id: string
   name: string
   partnumber: number
-  productlabel:string
+  location:string
+  measurement:string
   quantity:number
   category:string
-  maxinstock:number
-  mininstock:number
+  max_stock:number
+  min_stock:number
   price:number
 }
 
-export const columns: ColumnDef<Inventory>[] = [
+const handleDelete = async(id:any)=> {
+  try{
+    const response = await fetch(`/api/stock/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || "Failed to deleting stock")
+    }
+    toast(
+          "Success! Stock deleted.",
+        )
+  }catch(error){
+    toast(
+      `Failed to delete stock, Error: ${error}`
+   )
+  }
+}
+export const columns: ColumnDef<Stock>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -114,12 +127,23 @@ export const columns: ColumnDef<Inventory>[] = [
     },
   },
   {
-    accessorKey: "productlabel",
-    header: () => <div className="">Product Label</div>,
+    accessorKey: "location",
+    header: () => <div className="">Location</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("productlabel")}
+        {row.getValue("location")}
+        </Badge>
+        </div>
+    },
+  },
+  {
+    accessorKey: "measurement",
+    header: () => <div className="">Measurement</div>,
+    cell: ({ row }) => {
+      return <div>
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {row.getValue("measurement")}
         </Badge>
         </div>
     },
@@ -147,23 +171,23 @@ export const columns: ColumnDef<Inventory>[] = [
     },
   },
   {
-    accessorKey: "maxinstock",
+    accessorKey: "max_stock",
     header: () => <div className="">Max. in stock</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("maxinstock")}
+        {row.getValue("max_stock")}
         </Badge>
         </div>
     },
   },
   {
-    accessorKey: "mininstock",
+    accessorKey: "min_stock",
     header: () => <div className="">Min. in stock</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("mininstock")}
+        {row.getValue("min_stock")}
         </Badge>
         </div>
     },
@@ -184,30 +208,26 @@ export const columns: ColumnDef<Inventory>[] = [
     header:"Actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Edit /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500"><Trash className="text-red-500" /> Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+     return(
+      <DeleteButton item={row.original}/>
+     )
     },
   },
 ]
 
 
 const Getallinventory = () => {
+        const [stock, setStock] = React.useState<Stock[]>([])
+        const [loading, setLoading] = React.useState(true)
+
+        const fetchStock = async () => {
+          setLoading(true)
+          const response = await fetch("/api/stock")
+          const data = await response.json()
+          setStock(data.stocks)
+          setLoading(false)
+        }
+
      const [sorting, setSorting] = React.useState<SortingState>([])
       const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -217,7 +237,7 @@ const Getallinventory = () => {
       const [rowSelection, setRowSelection] = React.useState({})
     
       const table = useReactTable({
-        data,
+        data:stock,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -234,6 +254,9 @@ const Getallinventory = () => {
           rowSelection,
         },
       })
+        React.useEffect(() => {
+                    fetchStock()
+                  }, [])
   return (
     <div className="w-full">
          <div className="flex items-center py-4">
@@ -331,5 +354,86 @@ const Getallinventory = () => {
        </div>
   )
 }
+function TableCellViewer({ item }: {item:any }) {
+  const isMobile = useIsMobile()
 
+  return (
+    <Drawer direction={isMobile ? "bottom" : "right"}>
+      <DrawerTrigger asChild>
+        <Button variant="link" className="text-foreground w-fit cursor-pointer">
+          {item.name}
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="gap-1">
+          <DrawerTitle>Edit Stock</DrawerTitle>
+          <DrawerDescription>
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+          <form className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Name</Label>
+              <Input id="header" defaultValue={item.name} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Part Number</Label>
+              <Input id="header" defaultValue={item.partnumber} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Category</Label>
+              <Input id="header" defaultValue={item.category} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Location</Label>
+              <Input id="header" defaultValue={item.location} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Measurement</Label>
+              <Input id="header" defaultValue={item.measurement} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Quantity</Label>
+              <Input id="header" defaultValue={item.quantity} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Max. in Stock</Label>
+              <Input id="header" defaultValue={item.max_stock} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Min. in Stock</Label>
+              <Input id="header" defaultValue={item.min_stock} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="header">Price</Label>
+              <Input id="header" defaultValue={item.price} />
+            </div>
+          </form>
+        </div>
+        <DrawerFooter>
+          <Button>Save</Button>
+          <DrawerClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+function DeleteButton ({item}: {item:any}) {
+  return(
+    <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem className="text-red-500" onClick={()=>handleDelete(item._id)}><Trash className="text-red-500" /> Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+      </DropdownMenu>
+  )
+
+}
 export default Getallinventory

@@ -56,7 +56,7 @@ const handleDelete = async(id:any)=> {
     })
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.message || "Failed to create user")
+      throw new Error(error.message || "Failed to deleting user")
     }
     toast(
           "Success! User deleted.",
