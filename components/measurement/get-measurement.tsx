@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Loader2, MoreHorizontal, Trash } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Loader2, MoreHorizontal, RefreshCcw, Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -168,6 +168,17 @@ const Getmeasurement = () => {
                }
                className="max-w-sm"
              />
+             <div className="w-full flex justify-end mr-5">
+        <Button disabled={loading} onClick={fetchMeasurement}>
+          {
+            loading ? (
+              <RefreshCcw className="animate-spin"/>
+            ):(
+              <p className="flex justify-center gap-2 items-center"> <RefreshCcw /> Refresh</p>
+            )
+          }
+        </Button>
+        </div>
              <DropdownMenu>
                <DropdownMenuTrigger asChild>
                  <Button variant="outline" className="ml-auto">
