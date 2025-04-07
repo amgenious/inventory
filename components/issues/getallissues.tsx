@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Edit, MoreHorizontal, Trash } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Edit, Loader2, MoreHorizontal, Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -35,32 +35,19 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "../ui/badge"
 
-const data: Issues[] = [
-    {
-        id:'1',
-        clientname:"John Doe",
-        clientcontact:"02000333656",
-        orderdate:"March 2 2025",
-        amounttype:"Ghc",
-        paymenttype:"Cheque",
-        itemname:'Wireless Mouse',
-        price:200,
-        quantity:2,
-        totalprice:400
-    },
-]
 
 export type Issues = {
-  id: string
-  clientname:string
-  clientcontact:string
-  orderdate:string
-  amounttype:string
-  paymenttype:string
+  _id: string
+  referencenumber:string
+  valuedate:string
+  transtype:string
+  trancode:string
+  customer:string
+  remarks:string
   itemname: string
+  partnumber: string
+  location: string
   quantity:number
-  price:number
-  totalprice:number
 }
 
 export const columns: ColumnDef<Issues>[] = [
@@ -87,71 +74,72 @@ export const columns: ColumnDef<Issues>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "clientname",
+    accessorKey: "referencenumber",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Client Name
+          Reference Number
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="captilize ml-3 font-medium">{row.getValue("clientname")}</div>,
+    cell: ({ row }) => <ReferenceCell value={row.getValue("referencenumber")}/>,
   },
   {
-    accessorKey: "clientcontact",
-    header: () => <div className="">Client Contact</div>,
+    accessorKey: "valuedate",
+    header: () => <div className="">Value Date</div>,
     cell: ({ row }) => {
       return <div className="font-medium">
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("clientcontact")}
+        {row.getValue("valuedate")}
         </Badge>
         </div>
     },
   },
   {
-    accessorKey: "orderdate",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Order Date
-            <ArrowUpDown />
-          </Button>
-        )
-      },
+    accessorKey: "transtype",
+    header: () => <div>Trans Type</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("orderdate")}
+        {row.getValue("transtype")}
         </Badge>
         </div>
     },
   },
   {
-    accessorKey: "amounttype",
-    header: () => <div className="">Amount Type</div>,
+    accessorKey: "transcode",
+    header: () => <div className="">Trans Code</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("amounttype")}
+        {row.getValue("transcode")}
         </Badge>
         </div>
     },
   },
   {
-    accessorKey: "paymenttype",
-    header: () => <div className="">Payment Type</div>,
+    accessorKey: "customer",
+    header: () => <div className="">Customer</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("paymenttype")}
+        {row.getValue("customer")}
         </Badge>
+        </div>
+    },
+  },
+  {
+    accessorKey: "remarks",
+    header: () => <div className="">Remarks</div>,
+    cell: ({ row }) => {
+      return <div>
+        <p className="text-muted-foreground px-1.5">
+        {row.getValue("remarks")}
+        </p>
         </div>
     },
   },
@@ -177,12 +165,23 @@ export const columns: ColumnDef<Issues>[] = [
     },
   },
   {
-    accessorKey: "price",
-    header: () => <div className="">Price</div>,
+    accessorKey: "partnumber",
+    header: () => <div className="">Part Number</div>,
     cell: ({ row }) => {
       return <div>
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("price")}
+        {row.getValue("partnumber")}
+        </Badge>
+        </div>
+    },
+  },
+  {
+    accessorKey: "location",
+    header: () => <div className="">Location</div>,
+    cell: ({ row }) => {
+      return <div>
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {row.getValue("location")}
         </Badge>
         </div>
     },
@@ -198,51 +197,48 @@ export const columns: ColumnDef<Issues>[] = [
         </div>
     },
   },
-  {
-    accessorKey: "totalprice",
-    header: () => <div className="">Total Price</div>,
-    cell: ({ row }) => {
-      return <div>
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.getValue("totalprice")}
-        </Badge>
-        </div>
-    },
-  },
-  {
-    id: "actions",
-    header:"Actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="text-red-500"><Trash className="text-red-500" /> Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  // {
+  //   id: "actions",
+  //   header:"Actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     const payment = row.original
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuItem className="text-red-500"><Trash className="text-red-500" /> Delete</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
 ]
 
 const Getallissues = () => {
-     const [sorting, setSorting] = React.useState<SortingState>([])
-      const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-            []
-          )
-          const [columnVisibility, setColumnVisibility] =
-            React.useState<VisibilityState>({})
-          const [rowSelection, setRowSelection] = React.useState({})
+  const [issue, setIssue] = React.useState<Issues[]>([])
+  const [loading, setLoading] = React.useState(true)
+
+  const fetchIssue = async () => {
+    setLoading(true)
+    const response = await fetch("/api/issues")
+    const data = await response.json()
+    setIssue(data.issues)
+    setLoading(false)
+  }
+
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+    const [rowSelection, setRowSelection] = React.useState({})
         
-          const table = useReactTable({
-            data,
+    const table = useReactTable({
+            data:issue,
             columns,
             onSortingChange: setSorting,
             onColumnFiltersChange: setColumnFilters,
@@ -259,14 +255,17 @@ const Getallissues = () => {
               rowSelection,
             },
           })
+    React.useEffect(() => {
+         fetchIssue()
+    }, [])
   return (
      <div className="w-full">
              <div className="flex items-center py-4">
                <Input
                  placeholder="Filter Issues..."
-                 value={(table.getColumn("clientname")?.getFilterValue() as string) ?? ""}
+                 value={(table.getColumn("itemname")?.getFilterValue() as string) ?? ""}
                  onChange={(event) =>
-                   table.getColumn("clientname")?.setFilterValue(event.target.value)
+                   table.getColumn("itemname")?.setFilterValue(event.target.value)
                  }
                  className="max-w-sm"
                />
@@ -298,6 +297,11 @@ const Getallissues = () => {
                </DropdownMenu>
              </div>
              <div className="rounded-md border">
+             {
+                  loading ? (
+                    <Loader2 className="h-4 w-full text-center animate-spin"/>
+                  ):(
+                    
                <Table>
                  <TableHeader>
                    {table.getHeaderGroups().map((headerGroup) => (
@@ -346,6 +350,7 @@ const Getallissues = () => {
                    )}
                  </TableBody>
                </Table>
+                  )}
              </div>
              <div className="flex items-center justify-end space-x-2 py-4">
                <div className="flex-1 text-sm text-muted-foreground">
@@ -357,4 +362,27 @@ const Getallissues = () => {
   )
 }
 
+const ReferenceCell = ({ value }: { value: string }) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500); // reset after 1.5s
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleCopy}
+      className="capitalize ml-3 font-medium cursor-pointer hover:text-blue-600 transition"
+      title="Click to copy"
+    >
+      {value} {copied && <span className="text-sm text-green-500 ml-2">Copied!</span>}
+    </div>
+  );
+};
 export default Getallissues
