@@ -2,7 +2,7 @@
 import  React,{useState, useEffect} from "react";
 import { Input } from "@/components/ui/input";
 import { format, isAfter, isBefore } from "date-fns";
-import { CalendarIcon, Search,} from "lucide-react";
+import { CalendarIcon, Loader2, Search,} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,66 +12,118 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
+
 import { Separator } from "@/components/ui/separator";
 import {Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/select";
+import { toast } from 'sonner'
 
-const dummyData = [
-    { id: 1, name: "Wireless Mouse", category: "Electronics", date: "2025-03-20" },
-  ];
+
 
 const InventoryReportPage = () => {
-    const [search, setSearch] = useState("");
-    const [startDate, setStartDate] = useState<Date>();
-    const [endDate, setEndDate] = useState<Date>();
+    const [name, setName] = useState("");
+    // const [startDate, setStartDate] = useState<Date>();
     const [category, setCategory] = useState("");
-    const [filteredData, setFilteredData] = useState(dummyData);
+    const [partnumber, setPartnumber] = useState("");
+    const [location, setLocation] = useState("");
+    const [quantity, setQuantity] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [filteredData, setFilteredData] = useState<any>([]);
 
+    const [fetchedLocations, setFetchedLocations] = useState([])
+    const [fetchedCategory, setFetchedCategory] = useState([])
+    const [fetching, setFetching] = useState(false)
+
+    const fetchParams = async () => {
+      setFetching(true)
+
+      const response = await fetch("/api/locations")
+      const data = await response.json()
+      setFetchedLocations(data.locations)
+
+      const response1 = await fetch("/api/category")
+      const data1 = await response1.json()
+      setFetchedCategory(data1.category)
+
+      setFetching(false)
+    }
+    async function onSubmit(){
+      setIsSubmitting(true)
+      const params = new URLSearchParams();
+      if (name) params.append("name", name);
+  if (category) params.append("category",category);
+  if (partnumber) params.append("partnumber", partnumber);
+  if (location) params.append("location", location);
+  if (quantity) params.append("quantity",quantity.toString());
+
+  const queryString = params.toString();
+      try{
+          const response = await fetch(`/api/stock/search?${queryString}`)
+          if (!response.ok) {
+              const error = await response.json()
+              throw new Error(error.message || "Failed to search the item")
+            }
+          const data = await response.json()
+          setFilteredData(data.searchedStock)
+      }catch(error){
+          toast(`Failed to search. ${error}`)
+      }finally{
+          setIsSubmitting(false)
+      }
+  }
     useEffect(() => {
-        let filtered = dummyData;
-    
-        // Filter by search
-        if (search) {
-          filtered = filtered.filter((item) =>
-            item.name.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-    
-        // Filter by start and end dates
-        if (startDate) {
-          filtered = filtered.filter((item) => isAfter(new Date(item.date), new Date(startDate)) || format(new Date(item.date), "yyyy-MM-dd") === format(new Date(startDate), "yyyy-MM-dd"));
-        }
-    
-        if (startDate && endDate) {
-          filtered = filtered.filter(
-            (item) =>
-              (isAfter(new Date(item.date), new Date(startDate)) || format(new Date(item.date), "yyyy-MM-dd") === format(new Date(startDate), "yyyy-MM-dd")) &&
-              (isBefore(new Date(item.date), new Date(endDate)) || format(new Date(item.date), "yyyy-MM-dd") === format(new Date(endDate), "yyyy-MM-dd"))
-          );
-        }
-    
-        // Filter by category
-        if (category) {
-          filtered = filtered.filter((item) => item.category === category);
-        }
-    
-        setFilteredData(filtered);
-      }, [search, startDate, endDate, category]);
+      fetchParams()
+      }, []);
   return (
     <div className="px-4 lg:px-6">
       <h2 className="text-xl font-bold">Inventory Report</h2>
       <div className="w-full flex justify-between py-5">
         <div className="flex gap-4">
-        <Input placeholder="...🔍 Search Inventory" className="w-fit"  value={search}
-            onChange={(e) => setSearch(e.target.value)} />
-        <Popover>
+        <Input placeholder="Stock Name" className="w-fit" 
+            onChange={(e) => setName(e.target.value)} />
+        <Input placeholder="Part Number" className="w-fit" 
+            onChange={(e) => setPartnumber(e.target.value)} />
+        <Input placeholder="Quantity" type="number" className="w-fit" 
+            onChange={(e) => setQuantity(+e.target.value)} />
+        {
+            fetching ? (
+              <Loader2  className="h-4 w-full animate-spin text-center"/>
+            ):(
+          <Select onValueChange={setLocation} value={location}>
+                  <SelectTrigger id="location" className="">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {
+                    fetchedLocations.map((item: any, index: number) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+          </Select>
+            )
+          }  
+           {
+            fetching ? (
+              <Loader2  className="h-4 w-full animate-spin text-center"/>
+            ):(
+          <Select onValueChange={setCategory} value={category}>
+                  <SelectTrigger id="category" className="">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {
+                    fetchedCategory.map((item: any, index: number) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+          </Select>
+            )
+          }  
+        {/* <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
@@ -81,7 +133,7 @@ const InventoryReportPage = () => {
               )}
             >
               <CalendarIcon />
-              {startDate ? format(startDate, "PPP") : "Start date"}
+              {startDate ? format(startDate, "PPP") : "Date"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -92,46 +144,21 @@ const InventoryReportPage = () => {
               initialFocus
             />
           </PopoverContent>
-        </Popover>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-[240px] justify-start text-left font-normal",
-                !endDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon />
-              {endDate ? format(endDate, "PPP") : <span>End date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={endDate}
-              onSelect={setEndDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        <DropdownMenu>
-            <DropdownMenuTrigger className="border-2 px-3 rounded-md text-muted-foreground">
-              {category || "Category"}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Select Category</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {Array.from(new Set(dummyData.map((item) => item.category))).map((cat) => (
-                <DropdownMenuItem key={cat} onClick={() => setCategory(cat)}>
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuItem onClick={() => setCategory("")}>All</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        </Popover> */}
         </div>
-        <Button variant="default"><Search /> Search</Button>
+        <Button variant="default" disabled={isSubmitting} onClick={onSubmit} className="cursor-pointer">
+          {
+            isSubmitting ? (
+              <>
+                <Loader2  className='h-4 w-4 animate-spin'/> Searching...
+              </>
+              ):(
+              <>
+                <Search/> Search
+              </>
+               )
+         }
+          </Button>
       </div>
         <Separator />
         <div className="overflow-hidden rounded-lg border">
@@ -146,23 +173,22 @@ const InventoryReportPage = () => {
           </TableHeader>
           <TableBody>
             {filteredData.length ? (
-              filteredData.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.id}</TableCell>
+              filteredData.map((item:any) => (
+                <TableRow key={item._id}>
+                  <TableCell>{item._id}</TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
-                  <TableCell>{item.date}</TableCell>
+                  <TableCell>{item.updatedAt}</TableCell>
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+              
+              <div className="text-center w-full p-5">
                   No results found.
-                </TableCell>
-              </TableRow>
+                </div>
             )}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
       </div>
     </div>
   );
