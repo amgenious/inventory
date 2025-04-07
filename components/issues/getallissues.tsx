@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Edit, Loader2, MoreHorizontal, Trash } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Loader2, } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -378,7 +378,7 @@ const ReferenceCell = ({ value }: { value: string }) => {
   return (
     <div
       onClick={handleCopy}
-      className="capitalize ml-3 font-medium cursor-pointer hover:text-blue-600 transition"
+      className="capitalize ml-3 font-medium hover:text-blue-600 transition cursor-copy"
       title="Click to copy"
     >
       {value} {copied && <span className="text-sm text-green-500 ml-2">Copied!</span>}
