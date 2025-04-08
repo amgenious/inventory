@@ -266,26 +266,22 @@ const InventoryReportPage = () => {
 };
 function DetailsViewer({item}:{item:any}){
   const [searchedIssuename,setSearchedIssueName] = useState<any>([])
-  // const [searchedReceiptname,setSearchedReceiptName] = useState<any>([])
+  const [searchedReceiptname,setSearchedReceiptName] = useState<any>([])
   const [detailsSearch, setDetailsSearch] = useState(true)
   const fetchNewParams = async () => {
     setDetailsSearch(true)
 
-    // fetchReceipt(`${item.name}`)
-
     const response = await fetch(`/api/issues/search/name?query=${item.name}`)
     const data = await response.json()
     setSearchedIssueName(data.searchedIssue)
-    console.log(data.searchedIssue)
     
     setDetailsSearch(false)
   }
-  // const fetchReceipt = async(itemname:string)=>{
-  //   const response1 = await fetch(`/api/receipt/search/name?query1=${itemname}`)
-  //   const data1 = await response1.json()
-  //   console.log("Receipt data", response1)
-  //   setSearchedReceiptName(data1.searchReceipt)
-  // }
+  const fetchReceipt = async(itemname:string)=>{
+    const response1 = await fetch(`/api/receipt/search/name?query1=${itemname}`)
+    const data1 = await response1.json()
+    setSearchedReceiptName(data1.searchedReceipt)
+  }
   const formatDate = (timestamp: string): string => {
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) return "Invalid date"; // optional guard
@@ -293,13 +289,14 @@ function DetailsViewer({item}:{item:any}){
   };
   useEffect(()=>{
     fetchNewParams()
+    fetchReceipt(`${item.name}`)
   },[])
 return(
   <Dialog>
       <DialogTrigger asChild>
         <p className="cursor-pointer">{item.name}</p>
       </DialogTrigger>
-      <DialogContent className="max-w-[1050px]!">
+      <DialogContent className="max-w-[1050px]! max-h-fit">
         <DialogHeader>
           <DialogTitle>Details of {item.name}</DialogTitle>
           <DialogDescription>
@@ -379,7 +376,7 @@ return(
         </Table>
             </div>
           </div>
-          {/* <div className="w-full py-2">
+          <div className="w-full py-2">
             <p className="py-1">Receipts Made</p>
             <div>
             <Table>
@@ -419,7 +416,7 @@ return(
           </TableBody>
         </Table>
             </div>
-          </div> */}
+          </div>
         </div>
           )
         }
