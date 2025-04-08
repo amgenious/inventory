@@ -25,7 +25,7 @@ const Issuescorrection = () => {
             setSearched(data)
             setSearchedData(data.searchedIssue)
         }catch(error){
-            toast(`Failed to search. ${error}`)
+            toast.error(`Failed to search. ${error}`)
         }finally{
             setIsSubmitting(false)
         }

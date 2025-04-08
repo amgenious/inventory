@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                 {children}
               </div>
-              <Toaster />
+              <Toaster richColors position="bottom-center"/>
             </div>
           </div>
         </SidebarInset>

@@ -2,7 +2,7 @@
 import  React,{useState, useEffect} from "react";
 import { Input } from "@/components/ui/input";
 import { format, isAfter, isBefore } from "date-fns";
-import { CalendarIcon, Loader2, Search,} from "lucide-react";
+import { CalendarIcon, File, Loader2, Search,} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import {Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/select";
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 
 
@@ -34,6 +35,7 @@ const InventoryReportPage = () => {
     const [fetchedCategory, setFetchedCategory] = useState([])
     const [fetching, setFetching] = useState(false)
 
+    let downloaddata: any;
     const fetchParams = async () => {
       setFetching(true)
 
@@ -61,16 +63,65 @@ const InventoryReportPage = () => {
           const response = await fetch(`/api/stock/search?${queryString}`)
           if (!response.ok) {
               const error = await response.json()
+              toast.error(`Failed to search, ${error}`)
               throw new Error(error.message || "Failed to search the item")
             }
           const data = await response.json()
+          toast.success("Done with the search")
           setFilteredData(data.searchedStock)
       }catch(error){
-          toast(`Failed to search. ${error}`)
+          toast.error(`Failed to search. ${error}`)
       }finally{
           setIsSubmitting(false)
       }
-  }
+   }
+  const formatDate = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "Invalid date"; // optional guard
+    return date.toUTCString(); // or use toLocaleString() for local format
+  };
+  downloaddata = filteredData
+  const prefix = Math.random().toString();
+  const newT = prefix.slice(14,18)
+  const downloadCSV = (data: any[], filename = `stock-data${newT}.csv`) => {
+    const headers = [
+      "Date",
+      "Name",
+      "Category",
+      "Location",
+      "Measurement",
+      "Part Number",
+      "Mx. Stock",
+      "Mn. Stock",
+      "Quantity",
+      "Price",
+    ];
+  
+    const rows = data.map(item => [
+      new Date(item.updatedAt).toLocaleDateString(), // format date if needed
+      item.name,
+      item.category,
+      item.location,
+      item.measurement,
+      item.partnumber,
+      item.max_stock,
+      item.min_stock,
+      item.quantity,
+      item.price,
+    ]);
+  
+    const csvContent =
+      [headers, ...rows]
+        .map(row => row.map(value => `"${value}"`).join(","))
+        .join("\n");
+  
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  };
+  
     useEffect(() => {
       fetchParams()
       }, []);
@@ -162,30 +213,50 @@ const InventoryReportPage = () => {
       </div>
         <Separator />
         <div className="overflow-hidden rounded-lg border">
+          <div className="flex w-full p-2 justify-between items-center">
+            <div>
+              <h2 className="font-bold text-lg">Searched Results</h2>
+            </div>
+            <Button className="flex gap-2 cursor-pointer" onClick={()=>downloadCSV(downloaddata)}><File /> Download CSV</Button>
+          </div>
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Measurement</TableHead>
+              <TableHead>Part Number</TableHead>
+              <TableHead>Mx. Stock</TableHead>
+              <TableHead>Mn. Stock</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Price</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredData.length ? (
               filteredData.map((item:any) => (
                 <TableRow key={item._id}>
-                  <TableCell>{item._id}</TableCell>
-                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{formatDate(item.updatedAt)}</TableCell>
+                  <TableCell>
+                    <DetailsViewer item={item}/>
+                  </TableCell>
                   <TableCell>{item.category}</TableCell>
-                  <TableCell>{item.updatedAt}</TableCell>
+                  <TableCell>{item.location}</TableCell>
+                  <TableCell>{item.measurement}</TableCell>
+                  <TableCell>{item.partnumber}</TableCell>
+                  <TableCell>{item.max_stock}</TableCell>
+                  <TableCell>{item.min_stock}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item.price}</TableCell>
                 </TableRow>
               ))
             ) : (
               
-              <div className="text-center w-full p-5">
-                  No results found.
-                </div>
+              <TableRow className="text-center p-5">
+                  <TableCell>No results found.</TableCell>
+                </TableRow>
             )}
             </TableBody>
           </Table>
@@ -193,5 +264,170 @@ const InventoryReportPage = () => {
     </div>
   );
 };
+function DetailsViewer({item}:{item:any}){
+  const [searchedIssuename,setSearchedIssueName] = useState<any>([])
+  // const [searchedReceiptname,setSearchedReceiptName] = useState<any>([])
+  const [detailsSearch, setDetailsSearch] = useState(true)
+  const fetchNewParams = async () => {
+    setDetailsSearch(true)
 
+    // fetchReceipt(`${item.name}`)
+
+    const response = await fetch(`/api/issues/search/name?query=${item.name}`)
+    const data = await response.json()
+    setSearchedIssueName(data.searchedIssue)
+    console.log(data.searchedIssue)
+    
+    setDetailsSearch(false)
+  }
+  // const fetchReceipt = async(itemname:string)=>{
+  //   const response1 = await fetch(`/api/receipt/search/name?query1=${itemname}`)
+  //   const data1 = await response1.json()
+  //   console.log("Receipt data", response1)
+  //   setSearchedReceiptName(data1.searchReceipt)
+  // }
+  const formatDate = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "Invalid date"; // optional guard
+    return date.toUTCString(); // or use toLocaleString() for local format
+  };
+  useEffect(()=>{
+    fetchNewParams()
+  },[])
+return(
+  <Dialog>
+      <DialogTrigger asChild>
+        <p className="cursor-pointer">{item.name}</p>
+      </DialogTrigger>
+      <DialogContent className="max-w-[1050px]!">
+        <DialogHeader>
+          <DialogTitle>Details of {item.name}</DialogTitle>
+          <DialogDescription>
+            Click download PDF to save locally.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="w-full p-4 border rounded-lg">
+        <Table>
+          <TableHeader className="bg-muted sticky top-0 z-10">
+            <TableRow>
+              <TableHead>Last Updated</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Measurement</TableHead>
+              <TableHead>Part Number</TableHead>
+              <TableHead>Mx. Stock</TableHead>
+              <TableHead>Mn. Stock</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+                <TableRow key={item._id}>
+                  <TableCell>{formatDate(item.updatedAt)}</TableCell>
+                  <TableCell>{item.category}</TableCell>
+                  <TableCell>{item.location}</TableCell>
+                  <TableCell>{item.measurement}</TableCell>
+                  <TableCell>{item.partnumber}</TableCell>
+                  <TableCell>{item.max_stock}</TableCell>
+                  <TableCell>{item.min_stock}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item.price}</TableCell>
+                </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+        {
+          detailsSearch ? (
+            <Loader2 className="w-full h-4 animate-spin"/>
+          ):(
+        <div className="w-full p-4 border rounded-lg">
+          <p className="font-semibold py-2">Transactions Made</p>
+          <div className="w-full py-2">
+            <p className="py-1">Issues Made</p>
+            <div>
+            <Table>
+        <TableHeader className="bg-muted sticky top-0 z-10">
+          <TableRow>
+            <TableHead>Reference Number</TableHead>
+            <TableHead>Value Date</TableHead>
+            <TableHead>Trans Code</TableHead>
+            <TableHead>Trans Type</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Remarks</TableHead>
+            <TableHead>Quantity</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {searchedIssuename.length ? (
+            searchedIssuename.map((item:any) => (
+              <TableRow key={item._id}>
+                <TableCell>{item.referencenumber}</TableCell>
+                <TableCell>{item.valuedate}</TableCell>
+                <TableCell>{item.transcode}</TableCell>
+                <TableCell>{item.transtype}</TableCell>
+                <TableCell>{item.customer}</TableCell>
+                <TableCell>{item.remarks}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow className="text-center p-5">
+                <TableCell>No issue found.</TableCell>
+              </TableRow>
+          )}
+          </TableBody>
+        </Table>
+            </div>
+          </div>
+          {/* <div className="w-full py-2">
+            <p className="py-1">Receipts Made</p>
+            <div>
+            <Table>
+        <TableHeader className="bg-muted sticky top-0 z-10">
+          <TableRow>
+            <TableHead>Reference Number</TableHead>
+            <TableHead>Value Date</TableHead>
+            <TableHead>Invoice Number</TableHead>
+            <TableHead>Invoice Date</TableHead>
+            <TableHead>Trans Code</TableHead>
+            <TableHead>Trans Type</TableHead>
+            <TableHead>Supplier</TableHead>
+            <TableHead>Remarks</TableHead>
+            <TableHead>Quantity</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {searchedReceiptname.length ? (
+            searchedReceiptname.map((item:any) => (
+              <TableRow key={item._id}>
+                <TableCell>{item.referencenumber}</TableCell>
+                <TableCell>{item.valuedate}</TableCell>
+                <TableCell>{item.invoicenumber}</TableCell>
+                <TableCell>{item.invoicedate}</TableCell>
+                <TableCell>{item.transcode}</TableCell>
+                <TableCell>{item.transtype}</TableCell>
+                <TableCell>{item.supplier}</TableCell>
+                <TableCell>{item.remarks}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow className="text-center p-5">
+                <TableCell>No issue found.</TableCell>
+              </TableRow>
+          )}
+          </TableBody>
+        </Table>
+            </div>
+          </div> */}
+        </div>
+          )
+        }
+        <DialogFooter>
+          <Button type="submit" className="cursor-pointer" onClick={() => window.print()}><File/> Download PDF</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+)
+}
 export default InventoryReportPage;
