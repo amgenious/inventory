@@ -1,13 +1,34 @@
+"use client"
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import { SiteHeader } from "@/components/dashboard/site-header"
+import { useAuth } from "@/hooks/use-auth"
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const searchParams = useSearchParams()
+  const { user, isAuthenticated, logout } = useAuth()
+  const redirectPath = searchParams.get("from") || "/sign-in"
+  const router = useRouter()
+
+  useEffect(()=>{
+    if(!isAuthenticated){
+      router.push(redirectPath)
+    }
+  },[])
+  if (!isAuthenticated) {
+    return (
+      <></>
+    )
+  }
     return (
         <SidebarProvider
         style={

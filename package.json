@@ -33,6 +33,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.485.0",
     "mongoose": "^8.13.1",
     "next": "15.2.4",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

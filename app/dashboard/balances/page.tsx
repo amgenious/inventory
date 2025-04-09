@@ -3,7 +3,7 @@ import React,{useState,useEffect} from 'react'
 import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader, Plus } from 'lucide-react'
+import { Loader, LoaderCircle, Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -52,7 +52,7 @@ const OpenBalancesPage = () => {
       <div className='grid grid-cols-3'>
       {
         fetching ? (
-          <Skeleton className="h-6 w-full text-center bg-gray-200!"/>
+          <LoaderCircle  className='h-5 w-full text-center animate-spin'/>
         ):(
           <>
           <div className="flex gap-4 flex-1/3">
