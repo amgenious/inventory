@@ -18,6 +18,7 @@ import {Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/select";
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { IconPdf } from "@tabler/icons-react";
 
 
 
@@ -83,7 +84,7 @@ const InventoryReportPage = () => {
   downloaddata = filteredData
   const prefix = Math.random().toString();
   const newT = prefix.slice(14,18)
-  const downloadCSV = (data: any[], filename = `stock-data${newT}.csv`) => {
+  const downloadCSV = (data: any[], filename = `stock--report-${newT}.csv`) => {
     const headers = [
       "Date",
       "Name",
@@ -128,7 +129,7 @@ const InventoryReportPage = () => {
   return (
     <div className="px-4 lg:px-6">
       <h2 className="text-xl font-bold">Inventory Report</h2>
-      <div className="w-full flex justify-between py-5">
+      <div className="w-full flex justify-between py-5 hide-on-print">
         <div className="flex gap-4">
         <Input placeholder="Stock Name" className="w-fit" 
             onChange={(e) => setName(e.target.value)} />
@@ -421,7 +422,7 @@ return(
           )
         }
         <DialogFooter>
-          <Button type="submit" className="cursor-pointer hide-on-print" onClick={() => window.print()}><File/> Download PDF</Button>
+          <Button type="submit" className="cursor-pointer hide-on-print" onClick={() => window.print()}><IconPdf /> Download PDF</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

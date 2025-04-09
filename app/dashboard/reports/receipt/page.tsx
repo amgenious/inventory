@@ -7,12 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import {Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/select";
 import { toast } from 'sonner'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IconPdf } from "@tabler/icons-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format, isAfter, isBefore } from "date-fns";
+import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 
 
@@ -75,7 +74,7 @@ const ReceiptReportPage = () => {
        downloaddata = filteredData
        const prefix = Math.random().toString();
        const newT = prefix.slice(14,18)
-       const downloadCSV = (data: any[], filename = `receipt-data${newT}.csv`) => {
+       const downloadCSV = (data: any[], filename = `receipt-report-${newT}.csv`) => {
          const headers = [
            "Date",
            "Reference Number",
@@ -123,7 +122,7 @@ const ReceiptReportPage = () => {
   return (
     <div className='px-4 lg:px-6'>
       <h2 className='text-xl font-bold'>Receipt Report</h2>
-      <div className="w-full flex justify-between py-5">
+      <div className="w-full flex justify-between py-5 hide-on-print">
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
         <Input placeholder="Reference Number" className="w-fit" 
