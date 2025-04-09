@@ -45,7 +45,7 @@ const OpenBalancesPage = () => {
   return (
     <div className='px-4 lg:px-6'>
       <div className='flex justify-between pb-5'>
-        <h2>Opening Balance</h2>
+        <h2 className='text-xl font-bold'>Opening Balance</h2>
       </div>
       <Separator />
       <div className='flex gap-5 justify-between py-5'>
