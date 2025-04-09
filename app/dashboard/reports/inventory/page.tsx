@@ -421,7 +421,7 @@ return(
           )
         }
         <DialogFooter>
-          <Button type="submit" className="cursor-pointer" onClick={() => window.print()}><File/> Download PDF</Button>
+          <Button type="submit" className="cursor-pointer hide-on-print" onClick={() => window.print()}><File/> Download PDF</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

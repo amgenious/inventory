@@ -2,18 +2,24 @@
 import  React,{useState, useEffect} from "react";
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button";
-import { File, Loader2, Search } from 'lucide-react'
+import { CalendarIcon, File, Loader2, Search } from 'lucide-react'
 import { Separator } from "@/components/ui/separator";
 import {Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/select";
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { IconPdf } from "@tabler/icons-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, isAfter, isBefore } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 
 
 const ReceiptReportPage = () => {
       const [referencenumber, setReferencenumber] = useState("");
-      // const [startDate, setStartDate] = useState<Date>();
+      const [startDate, setStartDate] = useState<Date>();
+      const [endDate, setEndDate] = useState<Date>();
       const [supplier, setSupplier] = useState("");
       const [partnumber, setPartnumber] = useState("");
       const [invoicenumber, setInvoicenumber] = useState("");
@@ -46,7 +52,8 @@ const ReceiptReportPage = () => {
           if (partnumber) params.append("partnumber", partnumber);
           if (invoicenumber) params.append("invoicenumber",invoicenumber);
           if (supplier) params.append("supplier", supplier);
-          // if (date) params.append("date",date);
+          if (startDate) params.append("startDate",startDate.toISOString().split("T")[0]);
+          if (endDate) params.append("endDate",endDate.toISOString().split("T")[0]);
     
       const queryString = params.toString();
           try{
@@ -117,7 +124,8 @@ const ReceiptReportPage = () => {
     <div className='px-4 lg:px-6'>
       <h2 className='text-xl font-bold'>Receipt Report</h2>
       <div className="w-full flex justify-between py-5">
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
         <Input placeholder="Reference Number" className="w-fit" 
             onChange={(e) => setReferencenumber(e.target.value)} />
         <Input placeholder="Part Number" className="w-fit" 
@@ -125,10 +133,10 @@ const ReceiptReportPage = () => {
         <Input placeholder="Invoice Number" type="number" className="w-fit" 
             onChange={(e) => setInvoicenumber(e.target.value)} />
         {
-            fetching ? (
-              <Skeleton className="h-10 w-36 bg-gray-200!"/>
-            ):(
-          <Select onValueChange={setSupplier} value={supplier}>
+          fetching ? (
+            <Skeleton className="h-10 w-36 bg-gray-200!"/>
+          ):(
+            <Select onValueChange={setSupplier} value={supplier}>
                   <SelectTrigger id="supplier" className="">
                     <SelectValue placeholder="Select Supplier" />
                   </SelectTrigger>
@@ -143,7 +151,9 @@ const ReceiptReportPage = () => {
           </Select>
             )
           }  
-        {/* <Popover>
+        </div>
+        <div className="flex gap-4">
+        <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
@@ -153,7 +163,7 @@ const ReceiptReportPage = () => {
               )}
             >
               <CalendarIcon />
-              {startDate ? format(startDate, "PPP") : "Date"}
+              {startDate ? format(startDate, "PPP") : " Start Date"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -164,7 +174,30 @@ const ReceiptReportPage = () => {
               initialFocus
             />
           </PopoverContent>
-        </Popover> */}
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[240px] justify-start text-left font-normal",
+                !endDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {endDate ? format(endDate, "PPP") : " End Date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={endDate}
+              onSelect={setEndDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        </div>
         </div>
         <Button variant="default" disabled={isSubmitting} onClick={onSubmit}  className="cursor-pointer">
           {
@@ -186,7 +219,10 @@ const ReceiptReportPage = () => {
                   <div>
                     <h2 className="font-bold text-lg">Searched Results</h2>
                   </div>
-                  <Button className="flex gap-2 cursor-pointer"  onClick={()=>downloadCSV(downloaddata)}><File /> Download CSV</Button>
+                  <div className="flex gap-5">
+                  <Button type="submit"  className="cursor-pointer hide-on-print" onClick={() => window.print()}><IconPdf/> Download PDF</Button>
+                  <Button className="flex gap-2 cursor-pointer hide-on-print"  onClick={()=>downloadCSV(downloaddata)}><File /> Download CSV</Button>
+                   </div>
                 </div>
               <Table>
                 <TableHeader className="bg-muted sticky top-0 z-10">

@@ -9,14 +9,20 @@ export async function GET(request: NextRequest) {
         const partnumber = searchParams.get('partnumber'); 
         const invoicenumber = searchParams.get('invoicenumber'); 
         const supplier = searchParams.get('supplier'); 
-        const date = searchParams.get('date'); 
+        const startDate = searchParams.get('startDate'); 
+        const endDate = searchParams.get('endDate'); 
       
         let query: any = {};
         if (referencenumber) query.referencenumber = referencenumber;
         if (partnumber) query.partnumber = partnumber;
         if (invoicenumber) query.invoicenumber = invoicenumber;
         if (supplier) query.supplier = supplier;
-        if (date) query.date = date;
+        if (startDate && endDate) {
+            query.createdAt = {
+              $gte: new Date(startDate),
+              $lte: new Date(endDate),
+            };
+          }
     
         if (Object.keys(query).length === 0) {
             return NextResponse.json(
