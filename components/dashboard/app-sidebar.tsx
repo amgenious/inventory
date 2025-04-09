@@ -112,7 +112,7 @@ const data = {
   ],
   documents: [
     {
-      name: "Inventory",
+      name: "Stock",
       url: "/dashboard/reports/inventory",
       icon: IconDatabase,
     },

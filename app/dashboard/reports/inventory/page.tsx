@@ -84,7 +84,7 @@ const InventoryReportPage = () => {
   downloaddata = filteredData
   const prefix = Math.random().toString();
   const newT = prefix.slice(14,18)
-  const downloadCSV = (data: any[], filename = `stock--report-${newT}.csv`) => {
+  const downloadCSV = (data: any[], filename = `stock-report-${newT}.csv`) => {
     const headers = [
       "Date",
       "Name",
@@ -128,7 +128,7 @@ const InventoryReportPage = () => {
       }, []);
   return (
     <div className="px-4 lg:px-6">
-      <h2 className="text-xl font-bold">Inventory Report</h2>
+      <h2 className="text-xl font-bold">Stock Report</h2>
       <div className="w-full flex justify-between py-5 hide-on-print">
         <div className="flex gap-4">
         <Input placeholder="Stock Name" className="w-fit" 

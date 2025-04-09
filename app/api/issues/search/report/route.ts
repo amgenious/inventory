@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         if (startDate && endDate) {
             query.createdAt = {
               $gte: new Date(startDate),
-              $lte: new Date(endDate),
+              $lte: new Date(endDate).setHours(23, 59, 59, 999),
             };
           }
     
