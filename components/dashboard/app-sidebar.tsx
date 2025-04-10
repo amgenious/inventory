@@ -28,6 +28,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { GalleryVerticalEnd } from "lucide-react"
 
 const data = {
   user: {
@@ -140,7 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
+              <GalleryVerticalEnd className="size-6" />
                 <span className="text-base font-semibold">Sections</span>
               </a>
             </SidebarMenuButton>

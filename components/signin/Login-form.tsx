@@ -14,7 +14,7 @@ const Loginform = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter();
     const searchParams = useSearchParams()
-    const { login, isAuthenticated } = useAuth()
+    const { login, isAuthenticated,user } = useAuth()
       
     const redirectPath = searchParams.get("from") || "/dashboard"
 
@@ -52,11 +52,8 @@ async function onSubmit(){
 }
 if (!isAuthenticated) {
     return (
-      <></>
-    )
-  }
-  return (
-    <div className="flex flex-col gap-6">
+      <>
+      <div className="flex flex-col gap-6">
     <form>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col items-center gap-2">
@@ -110,6 +107,11 @@ if (!isAuthenticated) {
       and <a href="#">Privacy Policy</a>.
     </div>
   </div>
+      </>
+    )
+  }
+  return (
+    <></>
   )
 }
 
