@@ -78,11 +78,11 @@ const Addissues = () => {
         throw new Error(error.message || "Failed to create new issue")
       }
 
-      toast(
+      toast.success(
          "Success! New Issue has been created.",
       )
     } catch (error) {
-      toast(
+      toast.error(
          `Failed to create new issue, Error: ${error}`
       )
     } finally {

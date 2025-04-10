@@ -24,3 +24,26 @@ export async function DELETE(req: Request,  { params }: { params: Promise<{ id: 
     return NextResponse.json({ message: "Error deleting location" }, { status: 500 })
   }
 }
+
+export async function PUT(req: Request,  { params }: { params: Promise<{ id: string }> }) {
+  try{
+    const body = await req.json()
+    const {name} = body
+    if(!name){
+      return NextResponse.json({message:"Missing Location name"},{status:400})
+    }
+    await connectToDatabase()
+    const id = (await params).id;
+    if(!id){
+      return NextResponse.json({message:"Location ID is required"},{status:300})
+    }
+    const UpdateLocation = await Location.findByIdAndUpdate(id,{name:name},{new:true})
+    if(!UpdateLocation){
+      return NextResponse.json({message:"Location update not successful"},{status:400})
+    }
+    return NextResponse.json({message:"Location updted successfully"},{status:201})
+  }catch(error){
+    console.error("Error updating stock:", error)
+    return NextResponse.json({ message: `Error updating stock: ${error}` }, { status: 500 })    
+  }
+}

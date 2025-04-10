@@ -241,9 +241,38 @@ const Getlocation = () => {
     </div>
   )
 }
-
 function TableCellViewer({ item }: { item: any }) {
   const isMobile = useIsMobile()
+  const [newname, setNewname] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
+  async function onUpdate(){
+    setIsUpdating(true)
+    let name = newname ||  item.name
+    console.log("New name", name)
+    try{
+      const response = await fetch (`/api/locations/${item._id}`,{
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json",
+        },
+        body:JSON.stringify({name})
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        toast.error(`Failed to update name: ${error}`)
+        throw new Error(error.message || "Failed to create post")
+      }
+      toast.success(
+        "Success! Location has been updated",
+     )
+    } catch (error) {
+      toast.error(
+         `Failed to update location, Error ${error}`,
+      )
+    } finally {
+      setIsUpdating(false)
+    }
+  }
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -261,12 +290,21 @@ function TableCellViewer({ item }: { item: any }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Location</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewname(e.target.value)} />
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button disabled={isUpdating} onClick={onUpdate}>
+          {isUpdating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Updating...
+            </>
+          ) : (
+            "Update"
+          )}
+          </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>
@@ -275,6 +313,7 @@ function TableCellViewer({ item }: { item: any }) {
     </Drawer>
   )
 }
+
 function DeleteButton ({item}: {item:any}) {
   return(
     <DropdownMenu>

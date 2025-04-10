@@ -38,12 +38,12 @@ export function Addlocation() {
           throw new Error(error.message || "Failed to create post")
         }
   
-        toast(
+        toast.success(
            "Success! Location has been created",
         )
         router.refresh()
       } catch (error) {
-        toast(
+        toast.error(
            `Failed to create location, Error ${error}`,
         )
       } finally {
