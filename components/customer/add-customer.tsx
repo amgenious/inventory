@@ -42,12 +42,12 @@ const Addcustomer = () => {
                       throw new Error(error.message || "Failed to create new customer")
                     }
               
-                    toast(
+                    toast.success(
                        "Success! New customer has been created.",
                     )
                     router.refresh()
                   } catch (error) {
-                    toast(
+                    toast.error(
                        `Failed to create new customer, Error: ${error}`
                     )
                   } finally {
@@ -97,10 +97,10 @@ const Addcustomer = () => {
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
+            Adding...
           </>
         ) : (
-          "Save"
+          "Add Customer"
         )}
         </Button>
       </DialogFooter>

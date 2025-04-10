@@ -59,11 +59,11 @@ const handleDelete = async(id:any)=> {
       const error = await response.json()
       throw new Error(error.message || "Failed to delete customer")
     }
-    toast(
+    toast.success(
           "Success! Customer deleted.",
         )
   }catch(error){
-    toast(
+    toast.error(
       `Failed to delete customer, Error: ${error}`
    )
   }
@@ -313,7 +313,42 @@ const Getcustomer = () => {
 
 function TableCellViewer({ item }: {item:any }) {
   const isMobile = useIsMobile()
+  const [newname, setNewname] = React.useState("")
+  const [newemail, setNewemail] = React.useState("")
+  const [newcontact, setNewcontact] = React.useState("")
+  const [newaddress, setNewaddress] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
 
+   async function onUpdate(){
+        setIsUpdating(true)
+        let name = newname ||  item.name
+        let email = newemail ||  item.email
+        let contact = newcontact ||  item.contact
+        let address = newaddress ||  item.address
+        try{
+          const response = await fetch (`/api/customer/${item._id}`,{
+            method:"PUT",
+            headers:{
+              "Content-Type":"application/json",
+            },
+            body:JSON.stringify({name,email,contact,address})
+          })
+          if (!response.ok) {
+            const error = await response.json()
+            toast.error(`Failed to update customer: ${error}`)
+            throw new Error(error.message || "Failed to create post")
+          }
+          toast.success(
+            "Success! customer has been updated",
+         )
+        } catch (error) {
+          toast.error(
+             `Failed to update customer, Error ${error}`,
+          )
+        } finally {
+          setIsUpdating(false)
+        }
+      }
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -330,27 +365,36 @@ function TableCellViewer({ item }: {item:any }) {
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Name</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Label htmlFor="header">Customer Name</Label>
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewname(e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Email</Label>
-              <Input id="header" defaultValue={item.email} />
+              <Input id="header" defaultValue={item.email} onChange={(e)=>setNewemail(e.target.value)}/>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Contact</Label>
-              <Input id="header" defaultValue={item.contact} />
+              <Input id="header" defaultValue={item.contact} onChange={(e)=>setNewcontact(e.target.value)}/>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Address</Label>
-              <Input id="header" defaultValue={item.address} />
+              <Input id="header" defaultValue={item.address} onChange={(e)=>setNewaddress(e.target.value)}/>
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button className="cursor-pointer" disabled={isUpdating} onClick={onUpdate}>
+          {isUpdating ? (
+              <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+              </>
+              ) : (
+                  "Update"
+              )} 
+          </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
