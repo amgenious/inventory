@@ -22,7 +22,6 @@ const Addmeasurement = () => {
     const router = useRouter()
         async function onSubmit() {
           setIsSubmitting(true)
-          
           try {
             const response = await fetch("/api/measurement", {
               method: "POST",
@@ -37,12 +36,12 @@ const Addmeasurement = () => {
               throw new Error(error.message || "Failed to create measurement")
             }
       
-            toast(
+            toast.success(
                "Success! Measurement has been added.",
             )
             router.push('/dashboard/staticdata')
           } catch (error) {
-            toast(
+            toast.error(
                `Failed to create category, Error: ${error}`
             )
           } finally {
@@ -70,14 +69,14 @@ const Addmeasurement = () => {
         </div>
       </div>
       <DialogFooter>
-        <Button type="submit" disabled={isSubmitting} onClick={onSubmit}>
+        <Button type="submit" disabled={isSubmitting} onClick={onSubmit} className="cursor-pointer">
         {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Adding...
             </>
           ) : (
-            "Submit Post"
+            "Add Measurement"
           )}
           </Button>
       </DialogFooter>

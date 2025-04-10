@@ -53,14 +53,14 @@ const handleDelete = async(id:any)=> {
     })
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.message || "Failed to deleting category")
+      throw new Error(error.message || "Failed to deleting measurement")
     }
-    toast(
-          "Success! Category deleted.",
+    toast.success(
+          "Success! Measurement deleted.",
         )
   }catch(error){
-    toast(
-      `Failed to delete category, Error: ${error}`
+    toast.error(
+      `Failed to delete measurement, Error: ${error}`
    )
   }
 }
@@ -273,7 +273,35 @@ const Getmeasurement = () => {
 }
 function TableCellViewer({ item }: {item:any }) {
   const isMobile = useIsMobile()
-
+  const [newmeasurement, setNewmeasurement] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
+    async function onUpdate(){
+      setIsUpdating(true)
+      let name = newmeasurement ||  item.name
+      try{
+        const response = await fetch (`/api/measurement/${item._id}`,{
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json",
+          },
+          body:JSON.stringify({name})
+        })
+        if (!response.ok) {
+          const error = await response.json()
+          toast.error(`Failed to update measurement: ${error}`)
+          throw new Error(error.message || "Failed to create post")
+        }
+        toast.success(
+          "Success! measurement has been updated",
+       )
+      } catch (error) {
+        toast.error(
+           `Failed to update measurement, Error ${error}`,
+        )
+      } finally {
+        setIsUpdating(false)
+      }
+    }
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -291,12 +319,21 @@ function TableCellViewer({ item }: {item:any }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Measurement</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewmeasurement(e.target.value)}/>
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button disabled={isUpdating} onClick={onUpdate} className="cursor-pointer">
+            {isUpdating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update"
+            )} 
+            </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>
