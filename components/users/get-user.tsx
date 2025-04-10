@@ -38,6 +38,7 @@ import { DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescript
 import { Label } from "../ui/label"
 import { Badge } from "../ui/badge"
 import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 export type User = {
   _id: string
@@ -58,11 +59,11 @@ const handleDelete = async(id:any)=> {
       const error = await response.json()
       throw new Error(error.message || "Failed to deleting user")
     }
-    toast(
+    toast.success(
           "Success! User deleted.",
         )
   }catch(error){
-    toast(
+    toast.error(
       `Failed to delete user, Error: ${error}`
    )
   }
@@ -312,7 +313,39 @@ const Getuser = () => {
 
 function TableCellViewer({ item }: {item:any }) {
   const isMobile = useIsMobile()
-
+  const [newname, setNewname] = React.useState("")
+  const [newemail, setNewemail] = React.useState("")
+  const [newrole, setNewrole] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
+    async function onUpdate(){
+      setIsUpdating(true)
+      let name = newname ||  item.name
+      let email = newemail ||  item.email
+      let role = newrole ||  item.role
+      try{
+        const response = await fetch (`/api/users/${item._id}`,{
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json",
+          },
+          body:JSON.stringify({name,email,role})
+        })
+        if (!response.ok) {
+          const error = await response.json()
+          toast.error(`Failed to update user: ${error}`)
+          throw new Error(error.message || "Failed to create post")
+        }
+        toast.success(
+          "Success! user has been updated",
+       )
+      } catch (error) {
+        toast.error(
+           `Failed to update user, Error ${error}`,
+        )
+      } finally {
+        setIsUpdating(false)
+      }
+    }
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -330,26 +363,40 @@ function TableCellViewer({ item }: {item:any }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Name</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewname(e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Email</Label>
-              <Input id="header" defaultValue={item.email} />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Password</Label>
-              <Input id="header" defaultValue={item.password} />
+              <Input id="header" defaultValue={item.email} onChange={(e)=>setNewemail(e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Role</Label>
-              <Input id="header" defaultValue={item.role} />
+              <Select onValueChange={setNewrole} value={newrole} defaultValue={item.role}>
+                  <SelectTrigger id="status" className="w-full">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
             </div>
           </form>
+          <p>Password cannot be updated, when users are added, their passwords are hashed</p>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button className="cursor-pointer" disabled={isUpdating} onClick={onUpdate}>
+        {isUpdating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Updating...
+            </>
+            ) : (
+              "Update"
+          )} 
+          </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

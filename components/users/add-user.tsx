@@ -43,12 +43,12 @@ const Adduser = () => {
           throw new Error(error.message || "Failed to create new user")
         }
   
-        toast(
+        toast.success(
            "Success! New user has been created.",
         )
         router.refresh()
       } catch (error) {
-        toast(
+        toast.error(
            `Failed to create new user, Error: ${error}`
         )
       } finally {
@@ -70,7 +70,7 @@ const Adduser = () => {
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
             <Label htmlFor="name">
-              Category Name
+              User Name
             </Label>
             <Input id="name" placeholder="Name" onChange={(e) => setName(e.target.value)} className="col-span-3" required/>
           </div>
@@ -100,14 +100,14 @@ const Adduser = () => {
               </div>
             </div>
         <DialogFooter>
-          <Button type="submit" disabled={isSubmitting} onClick={onSubmit}>
+          <Button type="submit" disabled={isSubmitting} onClick={onSubmit} className="cursor-pointer">
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Adding...
             </>
           ) : (
-            "Save"
+            "Add User"
           )}
           </Button>
         </DialogFooter>
