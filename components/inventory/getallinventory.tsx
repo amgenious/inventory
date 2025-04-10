@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Edit, MoreHorizontal, RefreshCcw, Trash } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Edit, Loader2, MoreHorizontal, RefreshCcw, Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -39,6 +39,7 @@ import { toast } from "sonner"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "../ui/drawer"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Label } from "../ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 
 export type Stock = {
@@ -66,11 +67,11 @@ const handleDelete = async(id:any)=> {
       const error = await response.json()
       throw new Error(error.message || "Failed to deleting stock")
     }
-    toast(
+    toast.success(
           "Success! Stock deleted.",
         )
   }catch(error){
-    toast(
+    toast.error(
       `Failed to delete stock, Error: ${error}`
    )
   }
@@ -111,8 +112,9 @@ export const columns: ColumnDef<Stock>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="captilize ml-3 font-medium">
-      {row.getValue("name")}</div>,
+    cell: ({ row }) => {
+      return <TableCellViewer item={row.original}/>
+    }
   },
   {
     accessorKey: "partnumber",
@@ -367,7 +369,75 @@ const Getallinventory = () => {
 }
 function TableCellViewer({ item }: {item:any }) {
   const isMobile = useIsMobile()
+  const [newname, setNewname] = React.useState("")
+  const [newcategory, setNewcategory] = React.useState("")
+  const [newlocation, setNewlocation] = React.useState("")
+  const [newmeasurement, setNewmeasurement] = React.useState("")
+  const [newpartnumber, setNewpartnumber] = React.useState("")
+  const [newmax_stock, setNewmax_stock] = React.useState("")
+  const [newmin_stock, setNewmin_stock] = React.useState("")
+  const [newquantity, setNewquantity] = React.useState(0)
+  const [newprice, setNewprice] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
+  const [fetchedLocations, setFetchedLocations] = React.useState([])
+  const [fetchedCategory, setFetchedCategory] = React.useState([])
+  const [fetchedMeasurement, setFetchedMeasurement] = React.useState([])
+  const [fetching, setFetching] = React.useState(false)
+    async function onUpdate(){
+      setIsUpdating(true)
+      let name = newname ||  item.name
+      let category = newcategory ||  item.category
+      let location = newlocation ||  item.location
+      let measurement = newmeasurement ||  item.measurement
+      let partnumber = newpartnumber ||  item.partnumber
+      let max_stock = newmax_stock ||  item.max_stock
+      let min_stock = newmin_stock ||  item.min_stock
+      let quantity = newquantity ||  item.quantity
+      let price = newprice ||  item.price
+      try{
+        const response = await fetch (`/api/stock/update/${item._id}`,{
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json",
+          },
+          body:JSON.stringify({name,category,location,measurement,partnumber,max_stock,min_stock,quantity,price})
+        })
+        if (!response.ok) {
+          const error = await response.json()
+          toast.error(`Failed to update stock: ${error}`)
+          throw new Error(error.message || "Failed to create post")
+        }
+        toast.success(
+          "Success! stock has been updated",
+       )
+      } catch (error) {
+        toast.error(
+           `Failed to update stock, Error ${error}`,
+        )
+      } finally {
+        setIsUpdating(false)
+      }
+    }
+    const fetchParams = async () => {
+      setFetching(true)
 
+      const response = await fetch("/api/locations")
+      const data = await response.json()
+      setFetchedLocations(data.locations)
+
+      const response1 = await fetch("/api/category")
+      const data1 = await response1.json()
+      setFetchedCategory(data1.category)
+
+      const response2 = await fetch("/api/measurement")
+      const data2 = await response2.json()
+      setFetchedMeasurement(data2.measurement)
+
+      setFetching(false)
+    }
+    React.useEffect(() => {
+          fetchParams()
+      }, [])
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -385,46 +455,109 @@ function TableCellViewer({ item }: {item:any }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Name</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewname(e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Part Number</Label>
-              <Input id="header" defaultValue={item.partnumber} />
+              <Input id="header" defaultValue={item.partnumber} onChange={(e)=>setNewpartnumber(e.target.value)}/>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Category</Label>
-              <Input id="header" defaultValue={item.category} />
+              {
+            fetching ? (
+              <Loader2  className="h-4 w-full animate-spin text-center"/>
+            ):(
+          <Select onValueChange={setNewcategory} value={newcategory} defaultValue={item.category}>
+                  <SelectTrigger id="category" className="w-full">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {
+                    fetchedCategory.map((item: any, index: number) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+          </Select>
+            )
+          }
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Location</Label>
-              <Input id="header" defaultValue={item.location} />
+              {
+            fetching ? (
+              <Loader2  className="h-4 w-full animate-spin text-center"/>
+            ):(
+          <Select onValueChange={setNewlocation} value={newlocation} defaultValue={item.location}>
+                  <SelectTrigger id="location" className="w-full">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {
+                    fetchedLocations.map((item: any, index: number) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+          </Select>
+            )
+          }
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Measurement</Label>
-              <Input id="header" defaultValue={item.measurement} />
+              {
+            fetching ? (
+              <Loader2  className="h-4 w-full animate-spin text-center"/>
+            ):(
+          <Select onValueChange={setNewmeasurement} value={newmeasurement} defaultValue={item.measurement}>
+                  <SelectTrigger id="measurement" className="w-full">
+                    <SelectValue placeholder="Select Measurement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {
+                    fetchedMeasurement.map((item: any, index: number) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+          </Select>
+            )
+          }
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Quantity</Label>
-              <Input id="header" defaultValue={item.quantity} />
+              <Input id="header" defaultValue={item.quantity} onChange={(e)=>setNewquantity(+e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Max. in Stock</Label>
-              <Input id="header" defaultValue={item.max_stock} />
+              <Input id="header" defaultValue={item.max_stock} onChange={(e)=>setNewmax_stock(e.target.value)}/>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Min. in Stock</Label>
-              <Input id="header" defaultValue={item.min_stock} />
+              <Input id="header" defaultValue={item.min_stock} onChange={(e)=>setNewmin_stock(e.target.value)} />
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Price</Label>
-              <Input id="header" defaultValue={item.price} />
+              <Input id="header" defaultValue={item.price} onChange={(e)=>setNewprice(e.target.value)}/>
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button className="cursor-pointer" disabled={isUpdating} onClick={onUpdate} >
+           {isUpdating ? (
+               <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+              </>
+                ) : (
+                    "Update"
+            )} 
+          </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

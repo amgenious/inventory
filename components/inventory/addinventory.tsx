@@ -68,11 +68,11 @@ const Addinventory = () => {
               throw new Error(error.message || "Failed to create new stock")
             }
       
-            toast(
+            toast.success(
                "Success! New Stock has been created.",
             )
           } catch (error) {
-            toast(
+            toast.error(
                `Failed to create new stock, Error: ${error}`
             )
           } finally {
@@ -211,14 +211,14 @@ const Addinventory = () => {
         </div>
       </div>
       <DialogFooter>
-        <Button type="submit" disabled={isSubmitting} onClick={onSubmit}>
+        <Button type="submit" disabled={isSubmitting} onClick={onSubmit} className="cursor-pointer">
         {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Adding...
             </>
           ) : (
-            "Save"
+            "Add Stock"
           )}
           </Button>
       </DialogFooter>
