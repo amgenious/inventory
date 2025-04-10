@@ -40,6 +40,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, Dr
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { useAuth } from "@/hooks/use-auth"
 
 
 export type Stock = {
@@ -565,6 +566,7 @@ function TableCellViewer({ item }: {item:any }) {
   )
 }
 function DeleteButton ({item}: {item:any}) {
+  const { user } = useAuth()  
   return(
     <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -573,9 +575,11 @@ function DeleteButton ({item}: {item:any}) {
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          {
+            user?.role === 'admin' &&  <DropdownMenuContent align="end">
             <DropdownMenuItem className="text-red-500" onClick={()=>handleDelete(item._id)}><Trash className="text-red-500" /> Delete</DropdownMenuItem>
           </DropdownMenuContent>
+          }
       </DropdownMenu>
   )
 

@@ -39,6 +39,7 @@ import {
 } from "../ui/drawer"
 import { Label } from "../ui/label"
 import { toast } from "sonner"
+import { useAuth } from "@/hooks/use-auth"
 
 export type Location = {
   _id: string
@@ -314,6 +315,7 @@ function TableCellViewer({ item }: { item: any }) {
 }
 
 function DeleteButton ({item}: {item:any}) {
+  const { user } = useAuth()
   return(
     <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -322,9 +324,12 @@ function DeleteButton ({item}: {item:any}) {
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          {
+            user?.role === 'admin' &&  <DropdownMenuContent align="end">
             <DropdownMenuItem className="text-red-500" onClick={()=>handleDelete(item._id)}><Trash className="text-red-500" /> Delete</DropdownMenuItem>
           </DropdownMenuContent>
+          }
+         
       </DropdownMenu>
   )
 }
