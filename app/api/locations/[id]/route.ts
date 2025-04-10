@@ -41,9 +41,9 @@ export async function PUT(req: Request,  { params }: { params: Promise<{ id: str
     if(!UpdateLocation){
       return NextResponse.json({message:"Location update not successful"},{status:400})
     }
-    return NextResponse.json({message:"Location updted successfully"},{status:201})
+    return NextResponse.json({message:"Location updated successfully"},{status:201})
   }catch(error){
-    console.error("Error updating stock:", error)
-    return NextResponse.json({ message: `Error updating stock: ${error}` }, { status: 500 })    
+    console.error("Error updating location:", error)
+    return NextResponse.json({ message: `Error updating location: ${error}` }, { status: 500 })    
   }
 }

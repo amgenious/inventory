@@ -57,11 +57,11 @@ const handleDelete = async(id:any)=> {
       const error = await response.json()
       throw new Error(error.message || "Failed to deleting category")
     }
-    toast(
+    toast.success(
           "Success! Category deleted.",
         )
   }catch(error){
-    toast(
+    toast.error(
       `Failed to delete category, Error: ${error}`
    )
   }
@@ -282,6 +282,38 @@ React.useEffect(() => {
 
 function TableCellViewer({ item }: {item:any }) {
   const isMobile = useIsMobile()
+  const [newcategory, setNewcategory] = React.useState("")
+  const [newdescription, setNewdescription] = React.useState("")
+  const [isUpdating, setIsUpdating] = React.useState(false)
+    async function onUpdate(){
+      setIsUpdating(true)
+      let name = newcategory ||  item.name
+      let description = newdescription ||  item.description
+      try{
+        const response = await fetch (`/api/category/${item._id}`,{
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json",
+          },
+          body:JSON.stringify({name,description})
+        })
+        if (!response.ok) {
+          const error = await response.json()
+          toast.error(`Failed to update category: ${error}`)
+          throw new Error(error.message || "Failed to create post")
+        }
+        toast.success(
+          "Success! category has been updated",
+       )
+      } catch (error) {
+        toast.error(
+           `Failed to update catgory, Error ${error}`,
+        )
+      } finally {
+        setIsUpdating(false)
+      }
+    }
+  
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -300,20 +332,29 @@ function TableCellViewer({ item }: {item:any }) {
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Category Name</Label>
-              <Input id="header" defaultValue={item.name} />
+              <Input id="header" defaultValue={item.name} onChange={(e)=>setNewcategory(e.target.value)}/>
             </div>
             <div className="flex flex-col gap-4">
             <Label htmlFor="description">
                 Description
             </Label>
-            <Textarea id="description" defaultValue={item.description} className="col-span-3" />
+            <Textarea id="description" defaultValue={item.description} onChange={(e)=>setNewdescription(e.target.value)} className="col-span-3" />
           </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Save</Button>
+          <Button disabled={isUpdating} onClick={onUpdate} className="cursor-pointer">
+            {isUpdating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update"
+            )}
+          </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

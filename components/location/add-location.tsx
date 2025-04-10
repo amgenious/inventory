@@ -71,7 +71,7 @@ export function Addlocation() {
           </div>
         </div>
         <DialogFooter>
-        <Button type="submit" className="w-full" disabled={isSubmitting} onClick={onSubmit}>
+        <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting} onClick={onSubmit}>
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

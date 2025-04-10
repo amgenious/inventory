@@ -248,7 +248,6 @@ function TableCellViewer({ item }: { item: any }) {
   async function onUpdate(){
     setIsUpdating(true)
     let name = newname ||  item.name
-    console.log("New name", name)
     try{
       const response = await fetch (`/api/locations/${item._id}`,{
         method:"PUT",
@@ -259,7 +258,7 @@ function TableCellViewer({ item }: { item: any }) {
       })
       if (!response.ok) {
         const error = await response.json()
-        toast.error(`Failed to update name: ${error}`)
+        toast.error(`Failed to update location: ${error}`)
         throw new Error(error.message || "Failed to create post")
       }
       toast.success(
@@ -295,7 +294,7 @@ function TableCellViewer({ item }: { item: any }) {
           </form>
         </div>
         <DrawerFooter>
-          <Button disabled={isUpdating} onClick={onUpdate}>
+          <Button disabled={isUpdating} onClick={onUpdate} className="cursor-pointer">
           {isUpdating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -306,7 +305,7 @@ function TableCellViewer({ item }: { item: any }) {
           )}
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
